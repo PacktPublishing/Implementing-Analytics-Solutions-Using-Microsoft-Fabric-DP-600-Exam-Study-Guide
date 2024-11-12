@@ -1,0 +1,86 @@
+-- SQL Script for Data Partitioning in Microsoft Fabric
+-- Creates a partitioned SalesData table, splitting data into partitions based on SaleDate.
+-- Run this in Microsoft Fabric or any SQL environment that supports table partitioning.
+
+
+CREATE TABLE SalesData (
+    SaleID int,
+    SaleDate datetime,
+    TotalAmount decimal
+)
+PARTITION BY RANGE (SaleDate) (
+    PARTITION p1 VALUES LESS THAN ('2022-01-01'),
+    PARTITION p2 VALUES LESS THAN ('2023-01-01'),
+    PARTITION p3 VALUES LESS THAN ('2024-01-01')
+);
+
+-- Query to retrieve sales data within a specific date range for efficient scanning of relevant partitions.
+SELECT SaleID, TotalAmount
+FROM SalesData
+WHERE SaleDate BETWEEN '2022-05-01' AND '2022-12-31';
+
+
+
+
+# Enabling Azure Monitor for Microsoft Fabric Resources
+# This Azure CLI command enables monitoring for a specific resource.
+# Run in a terminal or command prompt with Azure CLI installed and authenticated: az login
+
+az monitor diagnostic-settings create --name "DiagnosticSetting" --resource <resource_id> --logs '[{"category": "AuditLogs", "enabled": true}]' --metrics '[{"category": "AllMetrics", "enabled": true}]'
+
+
+
+
+# Creating a Log Analytics Workspace in Azure
+# This Azure CLI command creates a Log Analytics workspace for monitoring data.
+# Run in a terminal or command prompt with Azure CLI installed.
+
+az monitor log-analytics workspace create --resource-group <resource_group> --workspace-name <workspace_name>
+
+
+
+
+// KQL Query for Tracking Query Performance
+// This Kusto Query Language (KQL) query tracks processor usage over time, summarizing the average processor time every 5 minutes.
+// Run this in Azure Log Analytics or Azure Monitor to view performance data.
+
+Perf
+| where ObjectName == "Processor" and CounterName == "% Processor Time"
+| summarize avg(CounterValue) by bin(TimeGenerated, 5m)
+| render timechart
+
+
+
+
+-- Creating an Index on CustomerID for Optimization
+-- Creates an index on the CustomerID column in SalesData to optimize data retrieval by CustomerID.
+-- Run in Microsoft Fabric or SQL environments with indexing capabilities.
+
+CREATE INDEX idx_CustomerID
+ON SalesData(CustomerID);
+
+-- Optimized query using the index for faster retrieval.
+SELECT CustomerID, TotalAmount
+FROM SalesData
+WHERE CustomerID = 12345;
+
+
+
+
+-- Viewing and Analyzing a Query Execution Plan in Microsoft Fabric
+-- Enables STATISTICS PROFILE to analyze the query execution plan, useful for performance tuning.
+-- Run in Microsoft Fabric or SQL environments that support execution plan analysis.
+
+SET STATISTICS PROFILE ON;
+SELECT * FROM SalesData WHERE SaleDate > '2022-01-01';
+SET STATISTICS PROFILE OFF;
+
+
+
+
+
+-- Creating a Columnstore Index for Optimized Storage and Retrieval
+-- Creates a clustered columnstore index on SalesData for optimized storage and retrieval of large datasets.
+-- Run in Microsoft Fabric or SQL environments that support columnstore indexing.
+
+CREATE CLUSTERED COLUMNSTORE INDEX IDX_SalesData ON SalesData;

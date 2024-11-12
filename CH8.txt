@@ -1,0 +1,48 @@
+// DAX Calculation for Total Sales
+// This formula calculates the total sales amount from the Sales table by summing up the SalesAmount column.
+// Use this in a calculated field or measure in Power BI or Analysis Services.
+
+Total Sales = SUM(Sales[SalesAmount])
+
+
+
+// DAX Formula Using SUMX for Row-by-Row Calculation
+// This formula calculates the total sales amount by multiplying Quantity and UnitPrice for each row, then summing the result.
+// Useful in scenarios where calculations need to occur at the row level before aggregation.
+
+Total Sales Amount = SUMX(Sales, Sales[Quantity] * Sales[UnitPrice])
+
+
+
+
+// DAX with CALCULATE for Applying Filters
+// This formula calculates the sum of sales amounts for the year 2023 by applying a filter to the Date column.
+// CALCULATE enables applying filters within measures or calculated fields.
+
+Sales in 2023 = CALCULATE(SUM(Sales[Amount]), YEAR(Sales[Date]) = 2023)
+
+
+
+
+// DAX Using RELATED for Combining Data Across Tables
+// This formula fetches related sales amount values from the Sales table, using the RELATED function for data relationships.
+// RELATED is useful in scenarios where data needs to be combined across tables with established relationships.
+
+Customer Sales = RELATED(Sales[Amount])
+
+
+
+
+// DAX Formula Using IF for Conditional Logic
+// This formula calculates the profit margin, ensuring no division by zero occurs by using an IF condition.
+// IF statements are useful for applying conditional logic within calculated fields or measures.
+
+Profit Margin = IF(SUM(Sales[Amount]) > 0, SUM(Sales[Profit]) / SUM(Sales[Amount]), 0)
+
+
+// DAX Formula Using SWITCH for Dynamic Segmentation
+// This formula classifies sales amounts into categories: High, Medium, or Low based on thresholds.
+// SWITCH with TRUE() enables dynamic segmentation based on conditional values.
+
+Sales Category = SWITCH(TRUE(), Sales[Amount] > 1000000, "High", Sales[Amount] > 500000, "Medium", "Low")
+

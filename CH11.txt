@@ -1,0 +1,170 @@
+-- Basic SQL Query for Selecting Specific Customer Details
+-- Retrieves customer IDs and names for customers in North America.
+-- Run this in any SQL environment such as SQL Server, MySQL, or PostgreSQL.
+
+SELECT customer_id, customer_name
+FROM customers
+WHERE region = 'North America';
+
+
+
+
+-- Aggregating Customer Count by Region
+-- Aggregates and counts customers by region, ordering by the highest counts first.
+-- Run this in any SQL environment with GROUP BY support.
+
+SELECT Region, COUNT(CustomerID) AS CustomerCount
+FROM Customers
+GROUP BY Region
+ORDER BY CustomerCount DESC;
+
+
+
+
+-- Joining Tables to Combine Customer and Sales Data
+-- Performs an inner join to get customer names and their sales amounts for sales after January 1, 2023.
+-- Run this in a SQL environment where both 'customers' and 'sales' tables are available.
+
+SELECT c.customer_name, s.sales_amount
+FROM customers c
+JOIN sales s ON c.customer_id = s.customer_id
+WHERE s.sales_date > '2023-01-01';
+
+
+
+
+-- Subquery to Retrieve Customers with Recent Purchases
+-- Uses a subquery to get customers with purchases made after January 1, 2023.
+-- Run this in any SQL environment that supports subqueries.
+
+SELECT customer_name
+FROM customers
+WHERE customer_id IN (
+    SELECT customer_id
+    FROM sales
+    WHERE sales_date > '2023-01-01'
+);
+
+
+
+
+-- Using a Common Table Expression (CTE) for Aggregated Sales
+-- Creates a CTE to calculate recent sales totals for each customer.
+-- Run this in SQL environments that support CTEs, like SQL Server or PostgreSQL.
+
+WITH recent_sales AS (
+    SELECT customer_id, SUM(sales_amount) AS total_sales
+    FROM sales
+    WHERE sales_date > '2023-01-01'
+    GROUP BY customer_id
+)
+SELECT * FROM recent_sales;
+
+
+
+
+-- Creating an Index to Improve Query Performance
+-- Creates an index on the customer_id column to optimize queries based on this column.
+-- Run this in SQL environments that support indexing.
+
+CREATE INDEX idx_customer_id ON customers(customer_id);
+
+
+
+
+-- Partitioning a Table by Date for Performance Optimization
+-- Creates a partitioned 'orders' table by order_date to optimize data retrieval based on date ranges.
+-- Run in SQL environments supporting table partitioning, such as SQL Server Enterprise or Azure Synapse.
+
+CREATE TABLE orders (
+    order_id INT,
+    order_date DATE
+)
+PARTITION BY RANGE(order_date) (
+    PARTITION p1 VALUES LESS THAN ('2023-01-01'),
+    PARTITION p2 VALUES LESS THAN ('2024-01-01')
+);
+
+
+
+
+-- Using EXPLAIN to Generate an Execution Plan
+-- Generates an execution plan to help analyze query performance.
+-- Run this in SQL environments with EXPLAIN support (e.g., MySQL, PostgreSQL).
+
+EXPLAIN SELECT customer_id, order_total
+FROM orders
+WHERE order_date > '2023-01-01';
+
+
+
+
+-- Enabling Result Set Caching in Synapse
+-- Enables result set caching to improve query performance by caching results.
+-- Run this in Azure Synapse to enable caching for the session.
+
+SET RESULT_SET_CACHING ON;
+
+
+
+-- Recursive Query with CTE for Hierarchical Data
+-- Uses a recursive CTE to display employee hierarchy based on manager relationships.
+-- Run in SQL environments supporting recursive CTEs, like SQL Server or PostgreSQL.
+
+WITH RecursiveCTE AS (
+    SELECT employee_id, manager_id, employee_name
+    FROM employees
+    WHERE manager_id IS NULL
+    UNION ALL
+    SELECT e.employee_id, e.manager_id, e.employee_name
+    FROM employees e
+    JOIN RecursiveCTE r ON e.manager_id = r.employee_id
+)
+SELECT * FROM RecursiveCTE;
+
+
+
+-- Window Function to Rank Employees by Salary
+-- Ranks employees by salary using the RANK() window function.
+-- Run in SQL environments that support window functions (e.g., SQL Server, PostgreSQL).
+
+SELECT employee_id, salary,
+       RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM employees;
+
+
+
+
+-- Calculating Cumulative Sales with SUM() OVER
+-- Uses SUM() with the OVER clause to calculate cumulative sales over time.
+-- Run in SQL environments that support window functions (e.g., SQL Server, MySQL).
+
+SELECT order_id, order_date, sales_amount,
+       SUM(sales_amount) OVER (ORDER BY order_date) AS cumulative_sales
+FROM sales;
+
+
+
+
+-- Query for Parallel Processing in SQL Pools
+-- Aggregates sales data by product_id, which can be executed in parallel processing SQL environments like SQL Pools.
+-- Run this in an environment such as Azure Synapse Analytics SQL Pool for optimized performance.
+
+SELECT product_id, SUM(sales_amount)
+FROM sales
+GROUP BY product_id
+ORDER BY SUM(sales_amount) DESC;
+
+
+
+
+-- Hash Partitioning Table by Customer ID
+-- Creates a table with hash distribution on customer_id and partitioning by order_date for improved performance.
+-- Run this in distributed SQL environments, like Azure Synapse, that support hash partitioning.
+
+CREATE TABLE orders (
+    order_id INT,
+    order_date DATE,
+    customer_id INT
+)
+WITH (DISTRIBUTION = HASH(customer_id), PARTITION BY RANGE(order_date));

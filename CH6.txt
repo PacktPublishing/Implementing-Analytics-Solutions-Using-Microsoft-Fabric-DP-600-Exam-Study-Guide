@@ -1,0 +1,179 @@
+# Standardizing Date Formats and Handling Missing Values
+# This function standardizes date formats, handles missing values, and normalizes numerical data.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+def transform_sales_data(raw_data_file, transformed_data_file):
+    data = pd.read_csv(raw_data_file)
+    # Standardize date format
+    data['date'] = pd.to_datetime(data['date'], errors='coerce')
+    # Fill missing values by forward fill
+    data.fillna(method='ffill', inplace=True)
+    # Normalize numerical values
+    data['sales'] = (data['sales'] - data['sales'].min()) / (data['sales'].max() - data['sales'].min())
+    data.to_csv(transformed_data_file, index=False)
+
+# Example usage
+transform_sales_data('raw_sales_data.csv', 'transformed_sales_data.csv')
+
+
+
+
+# Removing Duplicates and Handling Missing Values
+# This code removes duplicate rows and fills missing values.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+# Load the data
+data = pd.read_csv('raw_data.csv')
+# Remove duplicates
+data = data.drop_duplicates()
+# Handle missing values by forward filling
+data = data.fillna(method='ffill')
+# Save the cleaned data
+data.to_csv('cleaned_data.csv', index=False)
+
+
+
+
+# Standardizing Numerical Data Using StandardScaler
+# Standardizes data to have a mean of 0 and standard deviation of 1.
+# Requires Pandas and Scikit-learn: pip install pandas scikit-learn
+
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+
+# Load the data
+data = pd.read_csv('raw_data.csv')
+# Standardize the data
+scaler = StandardScaler()
+data[['numerical_column']] = scaler.fit_transform(data[['numerical_column']])
+# Save the standardized data
+data.to_csv('standardized_data.csv', index=False)
+
+
+
+# Applying Min-Max Scaling
+# This code applies Min-Max scaling to scale numerical data to a 0-1 range.
+# Requires Pandas and Scikit-learn: pip install pandas scikit-learn
+
+from sklearn.preprocessing import MinMaxScaler
+
+# Min-Max Scaling
+scaler = MinMaxScaler()
+data[['numerical_column']] = scaler.fit_transform(data[['numerical_column']])
+# Save the scaled data
+data.to_csv('minmax_scaled_data.csv', index=False)
+
+
+
+# Creating Tabular Data from Raw Data
+# Converts raw data into a structured DataFrame and saves it as a CSV file.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+# Load the raw data
+raw_data = {
+    'customer_id': [1, 2, 3],
+    'purchase_amount': [100, 200, 150],
+    'purchase_date': ['2023-01-01', '2023-01-02', '2023-01-03']
+}
+# Convert to DataFrame
+df = pd.DataFrame(raw_data)
+# Save the structured data
+df.to_csv('structured_data.csv', index=False)
+
+
+
+# Creating JSON Data from Python Dictionary
+# Converts a Python dictionary to a JSON file.
+# Requires the json library, which is part of Python's standard library.
+
+import json
+
+# Load the data
+data = {
+    'customers': [
+        {'id': 1, 'name': 'Alice', 'purchase': 100},
+        {'id': 2, 'name': 'Bob', 'purchase': 200}
+    ]
+}
+# Convert to JSON
+json_data = json.dumps(data, indent=4)
+# Save the JSON data
+with open('data.json', 'w') as f:
+    f.write(json_data)
+
+
+# Flattening Nested JSON
+# This code flattens nested JSON data for easier analysis and saves it as a CSV.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+import json
+
+# Load the JSON data
+with open('nested_data.json') as f:
+    data = json.load(f)
+# Flatten the nested JSON
+df = pd.json_normalize(data)
+# Save the flattened data
+df.to_csv('flattened_data.csv', index=False)
+
+
+
+# Time-Series Data Resampling and Rolling Mean
+# This script resamples time-series data to monthly frequency and calculates a rolling mean.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+# Load the time-series data
+data = pd.read_csv('time_series_data.csv', parse_dates=['timestamp'], index_col='timestamp')
+# Resample data to monthly frequency and calculate the mean
+monthly_data = data.resample('M').mean()
+# Calculate rolling mean with a 7-day window
+data['rolling_mean'] = data['value'].rolling(window=7).mean()
+# Save the transformed data
+data.to_csv('transformed_time_series_data.csv')
+
+
+
+# Optimizing Data Transformation with Apache Spark
+# This code performs data transformations using Spark, optimized for large datasets.
+# Requires PySpark installed: pip install pyspark
+
+from pyspark.sql import SparkSession
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("OptimizeTransformation").getOrCreate()
+# Load data
+df = spark.read.csv("raw_data.csv", header=True, inferSchema=True)
+# Perform transformations
+df = df.filter(df["amount"] > 0).groupBy("category").sum("amount")
+# Write optimized data
+df.write.csv("optimized_data.csv", header=True)
+
+
+# Data Integrity Check Script
+# This script checks for missing values and duplicates to verify data integrity.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+# Example of data integrity check
+def check_data_integrity(data_file):
+    data = pd.read_csv(data_file)
+    # Check for missing values
+    if data.isnull().sum().any():
+        raise ValueError("Data contains missing values")
+    # Check for duplicates
+    if data.duplicated().any():
+        raise ValueError("Data contains duplicate records")
+    print("Data integrity check passed")
+
+# Example usage
+check_data_integrity('transformed_data.csv')

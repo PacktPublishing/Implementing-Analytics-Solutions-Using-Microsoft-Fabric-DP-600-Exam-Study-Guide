@@ -1,0 +1,120 @@
+-- Creating a Partitioned Table for Sales Data
+-- This SQL script creates a partitioned table for sales data based on the SaleDate column.
+-- Run this in a SQL environment that supports table partitioning, such as SQL Server or Azure Synapse.
+
+CREATE TABLE Sales (
+    SaleID INT,
+    SaleDate DATE,
+    Amount DECIMAL(10, 2)
+)
+PARTITION BY RANGE (SaleDate);
+
+
+
+-- SQL Query for Selecting Sales Data within a Date Range
+-- Retrieves data within a specific date range to limit data scans, improving performance.
+-- Run this in the SQL environment where the Sales table is stored.
+
+SELECT SaleID, Amount
+FROM Sales
+WHERE SaleDate BETWEEN '2023-01-01' AND '2023-01-31';
+
+
+
+-- Indexing for Faster Data Retrieval
+-- Creates an index on the SaleDate column in the Sales table for optimized query performance.
+-- Run this command in the SQL environment where the Sales table exists.
+
+CREATE INDEX idx_SaleDate ON Sales(SaleDate);
+
+
+
+-- Materialized Views for Efficient Data Access
+-- Creates a materialized view to aggregate monthly sales totals for faster access.
+-- Run this in SQL environments that support materialized views, such as Azure Synapse or SQL Server.
+
+CREATE MATERIALIZED VIEW MonthlySales AS
+SELECT EXTRACT(MONTH FROM SaleDate) AS Month, SUM(Amount) AS TotalSales
+FROM Sales
+GROUP BY EXTRACT(MONTH FROM SaleDate);
+
+
+
+
+-- Optimizing SQL Query by Parameterization
+-- Uses parameterized values to safely and efficiently retrieve data within a date range.
+-- Run this in your SQL environment for dynamic and reusable query execution.
+
+DECLARE @StartDate DATE = '2023-01-01';
+DECLARE @EndDate DATE = '2023-01-31';
+
+SELECT SaleID, Amount
+FROM Sales
+WHERE SaleDate BETWEEN @StartDate AND @EndDate;
+
+
+
+
+
+
+# Python Code for Data Partitioning Example
+# Uses Pandas to partition data based on a date column and save each partition as a separate file.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+# Load large dataset
+data = pd.read_csv('sales_data.csv')
+
+# Partition data based on a date column
+data['partitioned_date'] = pd.to_datetime(data['sale_date']).dt.to_period('M')
+monthly_data = data.groupby('partitioned_date')
+
+# Save each partition as a separate file
+for date, partition in monthly_data:
+    partition.to_csv(f'sales_data_{date}.csv', index=False)
+
+
+
+
+
+
+# Parallel Processing with Apache Spark in Python
+# Uses PySpark to perform parallel processing and data aggregation.
+# Requires PySpark installed and a Spark environment: pip install pyspark
+
+from pyspark.sql import SparkSession
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("ParallelProcessing").getOrCreate()
+
+# Load data and perform transformations
+df = spark.read.csv("sales_data.csv", header=True, inferSchema=True)
+df = df.filter(df["amount"] > 0).groupBy("category").sum("amount")
+
+# Write optimized data
+df.write.csv("optimized_sales_data.csv", header=True)
+
+
+
+-- ETL with SQL and Python for Optimized Data Flow
+-- SQL script for extracting raw sales data based on a date condition.
+-- Run this in the SQL environment where the sales_data table exists.
+
+SELECT customer_id, sales_amount
+INTO raw_sales_data
+FROM sales_data
+WHERE sales_date >= '2023-01-01';
+
+
+
+
+# Python code for further transformation in ETL
+# Uses Pandas to add a calculated 'sales_tax' column to the extracted data.
+# Requires Pandas installed: pip install pandas
+
+import pandas as pd
+
+data = pd.read_csv('raw_sales_data.csv')
+data['sales_tax'] = data['sales_amount'] * 0.1
+data.to_csv('final_transformed_sales_data.csv', index=False)

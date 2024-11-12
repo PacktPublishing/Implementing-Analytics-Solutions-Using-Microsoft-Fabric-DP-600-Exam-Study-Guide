@@ -1,0 +1,30 @@
+# Setting Strategic Goals in Python
+# This script defines and prints strategic goals. It should be executed in a Python environment.
+# Ensure you have Python installed on your system.
+
+strategic_goals = {
+    "Improve Customer Retention": "20% increase by end of Q4",
+    "Reduce Operational Costs": "15% reduction by end of fiscal year",
+    "Increase Sales": "10% increase by end of Q3"
+}
+print("Strategic Goals:", strategic_goals)
+
+
+
+
+
+# Installing Fabric SDK for Python
+# Run this command in a terminal or command prompt with Python and pip installed
+# This installation is necessary to interact with Microsoft Fabric services.
+
+pip install fabric
+
+
+
+
+
+# Installing Azure SDK for Python
+# Run this command in a terminal or command prompt with Python and pip installed.
+# This SDK is required to interact with Azure services through Python.
+
+pip install azure
