@@ -1,0 +1,8 @@
+// KQL Query for Tracking Query Performance
+// Tracks processor usage over time, summarizing the average processor time every 5 minutes.
+// Run in Azure Log Analytics or Azure Monitor.
+
+Perf
+| where ObjectName == "Processor" and CounterName == "% Processor Time"
+| summarize avg(CounterValue) by bin(TimeGenerated, 5m)
+| render timechart

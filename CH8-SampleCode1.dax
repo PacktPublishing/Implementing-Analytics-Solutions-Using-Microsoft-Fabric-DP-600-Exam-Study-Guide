@@ -1,0 +1,32 @@
+// ==============================
+// DAX Calculations for Sales Analysis
+// ==============================
+
+// 1. Total Sales Calculation
+// This formula sums up the SalesAmount column from the Sales table.
+Total Sales = SUM(Sales[SalesAmount])
+
+
+// 2. Total Sales Amount Using SUMX
+// This formula calculates total sales by multiplying Quantity and UnitPrice for each row, then summing the results.
+Total Sales Amount = SUMX(Sales, Sales[Quantity] * Sales[UnitPrice])
+
+
+// 3. Sales in a Specific Year Using CALCULATE
+// This formula calculates the total sales amount for the year 2023.
+Sales in 2023 = CALCULATE(SUM(Sales[Amount]), YEAR(Sales[Date]) = 2023)
+
+
+// 4. Customer Sales Using RELATED
+// Fetches related sales amounts from the Sales table.
+Customer Sales = RELATED(Sales[Amount])
+
+
+// 5. Profit Margin Calculation Using IF
+// Ensures no division by zero by using a conditional check.
+Profit Margin = IF(SUM(Sales[Amount]) > 0, SUM(Sales[Profit]) / SUM(Sales[Amount]), 0)
+
+
+// 6. Sales Category Classification Using SWITCH
+// Dynamically categorizes sales amounts into High, Medium, or Low based on thresholds.
+Sales Category = SWITCH(TRUE(), Sales[Amount] > 1000000, "High", Sales[Amount] > 500000, "Medium", "Low")
